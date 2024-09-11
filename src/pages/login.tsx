@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    
+    if (storedUser) {
+      // Jika sudah login, arahkan ke dashboard
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +61,7 @@ export default function Login() {
             Login
           </button>
         </form>
+        <p className="text-[#0000007a] mt-6 text-center">Already have an account? <Link href="/register" className="text-[#000000dc]">Register</Link></p>
       </div>
     </div>
   );

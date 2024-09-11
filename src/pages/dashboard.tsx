@@ -1,16 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 
 export default function Dashboard() {
+  const router = useRouter();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-    setUser(storedUser);
-  }, []);
+    const storedUser = localStorage.getItem('user');
+    
+    if (!storedUser) {
+      router.push('/login');
+    } else {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [router]);
 
   useEffect(() => {
     if (user && user.id) {
@@ -38,21 +45,13 @@ export default function Dashboard() {
   };
 
   const deleteTask = async (id: number) => {
-    try {
-      const response = await fetch(`/api/task?taskId=${id}`, {
-        method: 'DELETE',
-      });
+    await fetch(`/api/task/${id}`, {
+      method: 'DELETE',
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to delete task');
-      }
-
-      // Update tasks secara lokal setelah task dihapus
-      const updatedTasks = tasks.filter((task: any) => task.id !== id);
-      setTasks(updatedTasks);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
+    fetch(`/api/task?userId=${user.id}`)
+      .then((response) => response.json())
+      .then((data) => setTasks(data));
   };
 
   const logout = () => {
@@ -68,10 +67,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6">
       <div className="w-full max-w-md flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-indigo-600">To-Do List</h1>
-        <button 
-          onClick={logout} 
-          className="px-2 py-2"
-        >
+        <button onClick={logout} className="px-2 py-2">
           <Image src="/assets/out.png" alt="icon logout" width={30} height={30} />
         </button>
       </div>
@@ -94,11 +90,11 @@ export default function Dashboard() {
           placeholder="New task"
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <button 
-          onClick={addTask} 
+        <button
+          onClick={addTask}
           className="ml-4 bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600"
         >
-          <Image src="/assets/plus.png" alt="icon add" width={28} height={30} />
+          <Image src="/assets/plus.png" alt="icon add task" width={28} height={30} />
         </button>
       </div>
 
@@ -107,11 +103,8 @@ export default function Dashboard() {
         {filteredTasks.map((task: any) => (
           <li key={task.id} className="flex justify-between items-center p-4 bg-white rounded-md shadow-md">
             <span>{task.title}</span>
-            <button 
-              onClick={() => deleteTask(task.id)}
-              className="text-red-500 hover:text-red-600"
-            >
-              <Image src="/assets/delete.png" alt="icon delete" width={27} height={30} />
+            <button onClick={() => deleteTask(task.id)}>
+              <Image src="/assets/delete.png" alt="icon delete task" width={27} height={30} />
             </button>
           </li>
         ))}
