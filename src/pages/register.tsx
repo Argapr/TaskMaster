@@ -61,7 +61,7 @@ export default function Register() {
             Register
           </button>
         </form>
-        <p className="text-[#0000007a] mt-6 text-center">Don't have an account? <Link href="/login" className="text-[#000000dc]">Login</Link></p>
+        <p className="text-[#0000007a] mt-6 text-center">Don&apos;t have an account? <Link href="/login" className="text-[#000000dc]">Login</Link></p>
       </div>
     </div>
   );
