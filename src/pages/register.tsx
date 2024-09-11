@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router'; // Import useRouter
+import { useRouter } from 'next/router';
 
 export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter(); // Inisialisasi router
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Lakukan request ke API register
     const response = await fetch('/api/register', {
       method: 'POST',
       headers: {
@@ -20,7 +19,6 @@ export default function Register() {
     });
 
     if (response.ok) {
-      // Setelah registrasi berhasil, arahkan ke halaman login
       router.push('/login');
     } else {
       const errorData = await response.json();
